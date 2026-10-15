@@ -11,6 +11,7 @@ concurrency:
 
 jobs:
   getExampleDirectories:
+    timeout-minutes: 60
     name: Get example directories
     runs-on: ubuntu-latest
     # Do not remove environment setup without considering changes to pull_request_target and checkout of PR, as it may lead to checks running automatically against malicious code in PRs.
@@ -31,6 +32,7 @@ jobs:
           echo "directories=$DIRS" >> $GITHUB_OUTPUT
 
   plan:
+    timeout-minutes: 60
     name: Plan examples
     needs: getExampleDirectories
     runs-on: ubuntu-latest
