@@ -41,7 +41,7 @@ jobs:
 
       - name: Get root directories
         id: dirs
-        uses: clowdhaus/terraform-composite-actions/directories@v1.4.1
+        uses: step-security/terraform-composite-actions/directories@2eac41b76974f2ae6fd8f1ad78d51eb3bdaed7b0 # v1.14.0
 
   preCommitMinVersions:
     name: Min TF pre-commit
@@ -61,7 +61,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: dorny/paths-filter@v2
+      - uses: step-security/paths-filter@230afa25a0d6389d2211715a8dececd6b43ca8a2 # v2.11.1
         id: changes
         with:
           # We only need to check Terraform files for the current directory
@@ -84,14 +84,14 @@ jobs:
           restore-keys: ${{ runner.os }}-terraform-
 
       - name: Terraform min/max versions
-        uses: clowdhaus/terraform-min-max@v1.0.7
+        uses: step-security/terraform-min-max@7c01b6babe47de9dcfdaa426c3354651299c8232 # v3.0.1
         if: steps.changes.outputs.src== 'true'
         id: minMax
         with:
           directory: ${{ matrix.directory }}
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.minVersion }}
-        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.6.0
+        uses: step-security/terraform-composite-actions/pre-commit@2eac41b76974f2ae6fd8f1ad78d51eb3bdaed7b0 # v1.14.0
         # Run only validate pre-commit check on min version supported
         if: ${{ matrix.directory !=  '.' && steps.changes.outputs.src== 'true' }}
         with:
@@ -99,7 +99,7 @@ jobs:
           args: 'terraform_validate --color=always --show-diff-on-failure --files ${{ matrix.directory }}/*'
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.minVersion }}
-        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.6.0
+        uses: step-security/terraform-composite-actions/pre-commit@2eac41b76974f2ae6fd8f1ad78d51eb3bdaed7b0 # v1.14.0
         # Run only validate pre-commit check on min version supported
         if: ${{ matrix.directory ==  '.' && steps.changes.outputs.src== 'true' }}
         with:
@@ -121,7 +121,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - uses: dorny/paths-filter@v2
+      - uses: step-security/paths-filter@230afa25a0d6389d2211715a8dececd6b43ca8a2 # v2.11.1
         id: changes
         with:
           filters: |
@@ -146,11 +146,11 @@ jobs:
 
       - name: Terraform min/max versions
         id: minMax
-        uses: clowdhaus/terraform-min-max@v1.0.7
+        uses: step-security/terraform-min-max@7c01b6babe47de9dcfdaa426c3354651299c8232 # v3.0.1
         if: steps.changes.outputs.src== 'true'
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.maxVersion }}
-        uses: clowdhaus/terraform-composite-actions/pre-commit@v1.6.0
+        uses: step-security/terraform-composite-actions/pre-commit@2eac41b76974f2ae6fd8f1ad78d51eb3bdaed7b0 # v1.14.0
         if: steps.changes.outputs.src== 'true'
         with:
           terraform-version: ${{ steps.minMax.outputs.maxVersion }}
