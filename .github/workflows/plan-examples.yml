@@ -21,12 +21,12 @@ jobs:
       directories: ${{ steps.dirs.outputs.directories }}
     steps:
       - name: Harden runner
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        uses: step-security/harden-runner@v2.22.4
         with:
           egress-policy: audit
       # Be careful not to change this to explicit checkout from PR ref/code, as below we run a python code that may change from the PR code.
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.7.0
 
       - name: Get Terraform directories for evaluation
         id: dirs
@@ -52,7 +52,7 @@ jobs:
 
     steps:
       - name: Harden runner
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        uses: step-security/harden-runner@v2.22.4
         with:
           egress-policy: audit
       - name: Remove default Terraform
@@ -60,15 +60,15 @@ jobs:
 
       - name: checkout-merge
         if: "contains(github.event_name, 'pull_request')"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.7.0
         with:
           ref: refs/pull/${{github.event.pull_request.number}}/merge
 
       - name: checkout
         if: "!contains(github.event_name, 'pull_request')"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.7.0
 
-      - uses: step-security/paths-filter@230afa25a0d6389d2211715a8dececd6b43ca8a2 # v2.11.1
+      - uses: step-security/paths-filter@v2.11.1
         id: changes
         with:
           # Need to check not only the example directory
@@ -81,7 +81,7 @@ jobs:
               - '*.tf'
 
       - name: Configure AWS credentials from Test account
-        uses: step-security/configure-aws-credentials@169c21e4c75dca522fb69a37bfdb5d8d634b9da4 # v6.3.0
+        uses: step-security/configure-aws-credentials@v6.3.0
         if: steps.changes.outputs.src== 'true'
         with:
           role-to-assume: ${{ secrets.ROLE_TO_ASSUME }}
@@ -91,7 +91,7 @@ jobs:
 
       - name: Terraform plan from CodeBuild
         if: steps.changes.outputs.src== 'true'
-        uses: step-security/aws-codebuild-run-build@ede99f55c020dc7db54823d29149aa26401c4bc8 # v1.0.19
+        uses: step-security/aws-codebuild-run-build@v1.0.19
         env:
           TF_VAR_aws_region: us-west-2
           TF_VAR_managed_grafana_workspace_id: ${{ secrets.GRAFANA_WORKSPACE_ID }}

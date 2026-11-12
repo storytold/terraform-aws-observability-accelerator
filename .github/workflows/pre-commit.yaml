@@ -33,15 +33,15 @@ jobs:
       directories: ${{ steps.dirs.outputs.directories }}
     steps:
       - name: Harden runner
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        uses: step-security/harden-runner@v2.22.4
         with:
           egress-policy: audit
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.7.0
 
       - name: Get root directories
         id: dirs
-        uses: step-security/terraform-composite-actions/directories@2eac41b76974f2ae6fd8f1ad78d51eb3bdaed7b0 # v1.14.0
+        uses: step-security/terraform-composite-actions/directories@v1.14.0
 
   preCommitMinVersions:
     name: Min TF pre-commit
@@ -52,16 +52,16 @@ jobs:
         directory: ${{ fromJson(needs.collectInputs.outputs.directories) }}
     steps:
       - name: Harden runner
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        uses: step-security/harden-runner@v2.22.4
         with:
           egress-policy: audit
       - name: Remove default Terraform
         run: rm -rf $(which terraform)
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.7.0
 
-      - uses: step-security/paths-filter@230afa25a0d6389d2211715a8dececd6b43ca8a2 # v2.11.1
+      - uses: step-security/paths-filter@v2.11.1
         id: changes
         with:
           # We only need to check Terraform files for the current directory
@@ -76,7 +76,7 @@ jobs:
         run: mkdir --parents ${{ env.TERRAFORM_DOCS_VERSION }}
 
       - name: Cache Terraform
-        uses: actions/cache@v3
+        uses: actions/cache@v3.5.0
         if: steps.changes.outputs.src== 'true'
         with:
           path: ${{ env.TERRAFORM_DOCS_VERSION }}
@@ -84,14 +84,14 @@ jobs:
           restore-keys: ${{ runner.os }}-terraform-
 
       - name: Terraform min/max versions
-        uses: step-security/terraform-min-max@7c01b6babe47de9dcfdaa426c3354651299c8232 # v3.0.1
+        uses: step-security/terraform-min-max@v3.0.1
         if: steps.changes.outputs.src== 'true'
         id: minMax
         with:
           directory: ${{ matrix.directory }}
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.minVersion }}
-        uses: step-security/terraform-composite-actions/pre-commit@2eac41b76974f2ae6fd8f1ad78d51eb3bdaed7b0 # v1.14.0
+        uses: step-security/terraform-composite-actions/pre-commit@v1.14.0
         # Run only validate pre-commit check on min version supported
         if: ${{ matrix.directory !=  '.' && steps.changes.outputs.src== 'true' }}
         with:
@@ -99,7 +99,7 @@ jobs:
           args: 'terraform_validate --color=always --show-diff-on-failure --files ${{ matrix.directory }}/*'
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.minVersion }}
-        uses: step-security/terraform-composite-actions/pre-commit@2eac41b76974f2ae6fd8f1ad78d51eb3bdaed7b0 # v1.14.0
+        uses: step-security/terraform-composite-actions/pre-commit@v1.14.0
         # Run only validate pre-commit check on min version supported
         if: ${{ matrix.directory ==  '.' && steps.changes.outputs.src== 'true' }}
         with:
@@ -112,16 +112,16 @@ jobs:
     needs: collectInputs
     steps:
       - name: Harden runner
-        uses: step-security/harden-runner@1d88384fd173af6ecb012dfd0264a306b711241a # v2.22.4
+        uses: step-security/harden-runner@v2.22.4
         with:
           egress-policy: audit
       - name: Remove default Terraform
         run: rm -rf $(which terraform)
 
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v3.7.0
 
-      - uses: step-security/paths-filter@230afa25a0d6389d2211715a8dececd6b43ca8a2 # v2.11.1
+      - uses: step-security/paths-filter@v2.11.1
         id: changes
         with:
           filters: |
@@ -133,7 +133,7 @@ jobs:
         run: mkdir --parents ${{ env.TERRAFORM_DOCS_VERSION }}
 
       - name: Cache Terraform
-        uses: actions/cache@v3
+        uses: actions/cache@v3.5.0
         if: steps.changes.outputs.src== 'true'
         with:
           path: ${{ env.TF_PLUGIN_CACHE_DIR }}
@@ -146,11 +146,11 @@ jobs:
 
       - name: Terraform min/max versions
         id: minMax
-        uses: step-security/terraform-min-max@7c01b6babe47de9dcfdaa426c3354651299c8232 # v3.0.1
+        uses: step-security/terraform-min-max@v3.0.1
         if: steps.changes.outputs.src== 'true'
 
       - name: Pre-commit Terraform ${{ steps.minMax.outputs.maxVersion }}
-        uses: step-security/terraform-composite-actions/pre-commit@2eac41b76974f2ae6fd8f1ad78d51eb3bdaed7b0 # v1.14.0
+        uses: step-security/terraform-composite-actions/pre-commit@v1.14.0
         if: steps.changes.outputs.src== 'true'
         with:
           terraform-version: ${{ steps.minMax.outputs.maxVersion }}
